@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SnapMark — 网页截图与标注插件</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#f7f8fc;
+    --text:#0f172a;
+    --text-soft:#5b6478;
+    --line:#e6e8f0;
+    --brand:#4f46e5;
+    --brand-dark:#4338ca;
+    --brand-soft:#eef0ff;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 12px 32px -12px rgba(15,23,42,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ---------- 导航 ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.01em}
+  .logo-mark{
+    width:28px;height:28px;border-radius:8px;
+    background:linear-gradient(135deg,var(--brand),#8b5cf6);
+    display:grid;place-items:center;color:#fff;font-size:15px;font-weight:800;
+  }
+  .nav-links{display:flex;gap:28px;font-size:14.5px;color:var(--text-soft)}
+  .nav-links a:hover{color:var(--text)}
+  @media(max-width:760px){.nav-links{display:none}}
+
+  /* ---------- 按钮 ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 20px;border-radius:10px;font-size:14.5px;font-weight:600;
+    border:1px solid transparent;cursor:pointer;transition:.18s;white-space:nowrap;
+  }
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 18px -6px rgba(79,70,229,.5)}
+  .btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px)}
+  .btn-ghost{background:#fff;border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:#c9cdda;background:#fafbff}
+  .btn-lg{padding:14px 26px;font-size:15.5px;border-radius:12px}
+  .btn-sm{padding:8px 16px;font-size:14px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:76px 0 64px;position:relative;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;inset:-200px 0 auto 0;height:600px;
+    background:radial-gradient(60% 100% at 50% 0%,rgba(79,70,229,.09),transparent 70%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative;text-align:center;max-width:760px;margin:0 auto}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;border-radius:100px;background:var(--brand-soft);
+    color:var(--brand-dark);font-size:13px;font-weight:600;margin-bottom:22px;
+    border:1px solid #dfe2ff;
+  }
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:#22c55e}
+  h1{
+    font-size:clamp(32px,5vw,54px);line-height:1.12;letter-spacing:-.025em;
+    font-weight:800;margin-bottom:20px;
+  }
+  h1 .grad{
+    background:linear-gradient(100deg,var(--brand),#8b5cf6 60%,#ec4899);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{font-size:clamp(16px,2vw,18.5px);color:var(--text-soft);margin-bottom:32px}
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .meta{margin-top:18px;font-size:13.5px;color:#8b93a7}
+
+  /* ---------- 产品截图 mockup ---------- */
+  .shot{margin:56px auto 0;max-width:900px}
+  .browser{
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    background:#fff;box-shadow:var(--shadow);
+  }
+  .browser-bar{
+    display:flex;align-items:center;gap:8px;padding:11px 14px;
+    background:var(--bg-soft);border-bottom:1px solid var(--line);
+  }
+  .browser-bar i{width:11px;height:11px;border-radius:50%;background:#d7dae5;display:block}
+  .browser-bar i:nth-child(1){background:#ff5f57}
+  .browser-bar i:nth-child(2){background:#febc2e}
+  .browser-bar i:nth-child(3){background:#28c840}
+  .browser-url{
+    flex:1;margin-left:10px;height:26px;border-radius:6px;background:#fff;
+    border:1px solid var(--line);display:flex;align-items:center;
+    padding:0 12px;font-size:12.5px;color:#9aa1b4;
+  }
+  .browser-body{
+    height:340px;background:
+      linear-gradient(180deg,#fbfcff,#f4f6fd);
+    display:grid;place-items:center;position:relative;padding:24px;
+  }
+  .mock-ui{
+    width:100%;max-width:640px;background:#fff;border-radius:12px;
+    border:1px solid var(--line);box-shadow:0 8px 24px -12px rgba(15,23,42,.18);
+    padding:20px;
+  }
+  .mock-line{height:10px;border-radius:6px;background:#eef0f7;margin-bottom:10px}
+  .mock-line.w60{width:60%}
+  .mock-line.w85{width:85%}
+  .mock-line.w40{width:40%}
+  .mock-toolbar{display:flex;gap:8px;margin-bottom:16px}
+  .mock-tool{
+    width:34px;height:34px;border-radius:9px;background:var(--brand-soft);
+    display:grid;place-items:center;color:var(--brand);font-size:15px;
+  }
+  .mock-tool.active{background:var(--brand);color:#fff}
+
+  /* ---------- 通用 section ---------- */
+  section{padding:80px 0}
+  .section-head{text-align:center;max-width:620px;margin:0 auto 52px}
+  .eyebrow{
+    font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--brand);margin-bottom:12px;
+  }
+  h2{font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;line-height:1.2;font-weight:800;margin-bottom:14px}
+  .section-head p{color:var(--text-soft);font-size:16.5px}
+
+  /* ---------- 特性 ---------- */
+  .features{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px;transition:.2s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#dcdff0}
+  .card-icon{
+    width:42px;height:42px;border-radius:11px;background:var(--brand-soft);
+    display:grid;place-items:center;font-size:20px;margin-bottom:16px;
+  }
+  .card h3{font-size:16.5px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+  .card p{font-size:14.5px;color:var(--text-soft);line-height:1.65}
+
+  /* ---------- 定价 ---------- */
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:820px;margin:0 auto}
+  @media(max-width:720px){.plans{grid-template-columns:1fr}}
+  .plan{
+    border:1px solid var(--line);border-radius:18px;padding:32px;
+    background:#fff;display:flex;flex-direction:column;position:relative;
+  }
+  .plan.pro{
+    border-color:var(--brand);border-width:1.5px;
+    box-shadow:0 20px 50px -24px rgba(79,70,229,.45);
+  }
+  .plan-tag{
+    position:absolute;top:-12px;left:32px;
+    background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+    padding:4px 12px;border-radius:100px;letter-spacing:.02em;
+  }
+  .plan h3{font-size:17px;font-weight:700;margin-bottom:6px}
+  .plan .desc{font-size:14px;color:var(--text-soft);margin-bottom:20px}
+  .price{display:flex;align-items:baseline;gap:6px;margin-bottom:6px}
+  .price .num{font-size:40px;font-weight:800;letter-spacing:-.03em}
+  .price .unit{font-size:14.5px;color:var(--text-soft)}
+  .price-note{font-size:13px;color:#8b93a7;margin-bottom:24px}
+  .plan ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:28px;flex:1}
+  .plan li{display:flex;gap:10px;font-size:14.5px;color:var(--text-soft);align-items:flex-start}
+  .plan li::before{
+    content:"✓";flex:0 0 18px;height:18px;border-radius:50%;
+    background:var(--brand-soft);color:var(--brand);font-size:11px;font-weight:800;
+    display:grid;place-items:center;margin-top:3px;
+  }
+  .plan .btn{width:100%}
+
+  /* ---------- FAQ ---------- */
+  .faq{max-width:720px;margin:0 auto}
+  details{
+    border-bottom:1px solid var(--line);padding:20px 0;
+  }
+  details summary{
+    cursor:pointer;font-weight:600;font-size:16px;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{
+    content:"+";font-size:20px;color:var(--text-soft);font-weight:400;
+    transition:.2s;flex:0 0 auto;
+  }
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{margin-top:12px;color:var(--text-soft);font-size:15px;line-height:1.7}
+
+  /* ---------- CTA 尾段 ---------- */
+  .final{
+    background:linear-gradient(135deg,#1e1b4b,#312e81 55%,#4c1d95);
+    color:#fff;border-radius:22px;padding:56px 32px;text-align:center;
+    margin:0 0 -80px;position:relative;overflow:hidden;
+  }
+  .final::after{
+    content:"";position:absolute;inset:auto -80px -120px auto;
+    width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(139,92,246,.5),transparent 70%);
+  }
+  .final h2{color:#fff;position:relative}
+  .final p{color:#c7c9e8;position:relative;margin-bottom:28px;font-size:16.5px}
+  .final .btn{position:relative}
+  .final .btn-white{background:#fff;color:#312e81}
+  .final .btn-white:hover{background:#f0f0ff;transform:translateY(-1px)}
+
+  /* ---------- 页脚 ---------- */
+  footer{border-top:1px solid var(--line);padding:40px 0 32px;margin-top:80px}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot-left{font-size:14px;color:var(--text-soft)}
+  .foot-links{display:flex;gap:24px;font-size:14px;color:var(--text-soft)}
+  .foot-links a:hover{color:var(--brand)}
+
+  /* ---------- Toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:32px;transform:translate(-50%,120%);
+    background:#0f172a;color:#fff;padding:13px 22px;border-radius:11px;
+    font-size:14.5px;box-shadow:0 16px 40px -12px rgba(0,0,0,.4);
+    transition:transform .32s cubic-bezier(.2,.9,.3,1.2);z-index:100;
+  }
+  #toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="logo-mark">S</span>SnapMark</div>
+    <nav class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#pricing">定价</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <button class="btn btn-primary btn-sm" onclick="buy('SnapMark Pro')">立即购买</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="badge"><span class="dot"></span>v1.0 已上线</div>
+    <h1>截图、标注、分享<br><span class="grad">三步搞定</span></h1>
+    <p class="sub">一款轻量的浏览器插件，帮你在网页上直接截图、加标注、生成分享链接。不用截图软件，不用来回切窗口。</p>
+    <div class="cta-row">
+      <button class="btn btn-primary btn-lg" onclick="buy('SnapMark Pro')">购买 Pro 版 · ¥49</button>
+      <a class="btn btn-ghost btn-lg" href="#features">查看功能</a>
+    </div>
+    <p class="meta">一次买断 · 免费更新一年 · 支持 7 天无理由退款</p>
+  </div>
+
+  <div class="wrap shot">
+    <div class="browser">
+      <div class="browser-bar">
+        <i></i><i></i><i></i>
+        <div class="browser-url">example.com/dashboard</div>
+      </div>
+      <div class="browser-body">
+        <div class="mock-ui">
+          <div class="mock-toolbar">
+            <div class="mock-tool active">✂</div>
+            <div class="mock-tool">▭</div>
+            <div class="mock-tool">→</div>
+            <div class="mock-tool">T</div>
+            <div class="mock-tool">◯</div>
+          </div>
+          <div class="mock-line w85"></div>
+          <div class="mock-line w60"></div>
+          <div class="mock-line"></div>
+          <div class="mock-line w40"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 功能 -->
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">核心功能</div>
+      <h2>为日常网页工作而设计</h2>
+      <p>不做多余的事，只把截图这件事做到顺手。</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">✂</div>
+        <h3>区域截图</h3>
+        <p>拖拽选择任意区域，自动识别页面元素边界，不用反复调整选框。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✎</div>
+        <h3>即时标注</h3>
+        <p>箭头、方框、文字、马赛克一应俱全，截图后直接编辑，无需跳出页面。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <h3>一键分享</h3>
+        <p>生成短链，图片存云端，对方点开即看，不用下载附件。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⌨</div>
+        <h3>快捷键操作</h3>
+        <p>可自定义快捷键，截图到复制粘贴最快不到两秒。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌙</div>
+        <h3>深色模式适配</h3>
+        <p>自动识别页面主题，工具栏在深色页面上也清晰可见。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>本地优先</h3>
+        <p>默认截图保存在本地，只有你主动分享时才会上传。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 定价 -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">定价</div>
+      <h2>免费够用，Pro 更省心</h2>
+      <p>无需注册即可使用免费版。Pro 版一次买断，没有订阅。</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>免费版</h3>
+        <p class="desc">适合偶尔用用的轻量场景</p>
+        <div class="price"><span class="num">¥0</span></div>
+        <p class="price-note">永久免费</p>
+        <ul>
+          <li>区域截图</li>
+          <li>基础箭头与方框标注</li>
+          <li>本地保存与复制</li>
+          <li>每日 10 次截图</li>
+        </ul>
+        <button class="btn btn-ghost" onclick="toast('免费版即将上线，敬请期待')">免费使用</button>
+      </div>
+
+      <div class="plan pro">
+        <span class="plan-tag">推荐</span>
+        <h3>Pro 版</h3>
+        <p class="desc">适合每天都要截图的开发者与设计师</p>
+        <div class="price"><span class="num">¥49</span><span class="unit">/ 一次买断</span></div>
+        <p class="price-note">含一年免费更新，之后可选续费</p>
+        <ul>
+          <li>无限次截图</li>
+          <li>全部标注工具（含马赛克、高亮）</li>
+          <li>云端分享链接</li>
+          <li>自定义快捷键</li>
+          <li>长截图 / 整页截图</li>
+          <li>优先邮件支持</li>
+        </ul>
+        <button class="btn btn-primary" onclick="buy('SnapMark Pro')">购买 Pro 版</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">常见问题</div>
+      <h2>你可能想知道</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>买断是什么意思？以后还要付费吗？</summary>
+        <p>一次购买即永久使用当前版本，包含一年内的所有更新。一年后如果发布了重大新版本，你可以选择续费更新，但不续费也能继续用已购买的版本。</p>
+      </details>
+      <details>
+        <summary>支持哪些浏览器？</summary>
+        <p>目前支持 Chrome、Edge 以及所有基于 Chromium 的浏览器。Firefox 版本正在开发中。</p>
+      </details>
+      <details>
+        <summary>可以退款吗？</summary>
+        <p>支持 7 天无理由退款。如果插件不符合你的预期，发邮件说明订单号即可，无需解释原因。</p>
+      </details>
+      <details>
+        <summary>许可证可以换电脑吗？</summary>
+        <p>可以。一个许可证默认支持绑定 3 台设备，更换设备时在旧设备上解绑即可。</p>
+      </details>
+      <details>
+        <summary>我的截图会被上传吗？</summary>
+        <p>不会。截图默认保存在本地。只有当你点击「生成分享链接」时，那一张图片才会加密上传到云端。</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- 尾部 CTA -->
+<div class="wrap">
+  <div class="final">
+    <h2>现在就开始用</h2>
+    <p>49 元，一次买断，把截图这件事变得不再烦人。</p>
+    <button class="btn btn-white btn-lg" onclick="buy('SnapMark Pro')">购买 Pro 版</button>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot">
+    <div class="foot-left">© 2026 SnapMark. 保留所有权利。</div>
+    <div class="foot-links">
+      <a href="#">使用条款</a>
+      <a href="#">隐私政策</a>
+      <a href="#">联系支持</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+  let toastTimer;
+  function toast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+
+  // 支付功能占位：后续替换成支付宝 AI 收的调用
+  function buy(product){
+    toast('「' + product + '」支付功能待接入');
+    // 接入支付宝后大致是这样的流程：
+    // 1. 调用后端接口创建订单，拿到 out_trade_no
+    // 2. 跳转到支付宝收银台或唤起支付浮层
+    // 3. 支付成功后回调，发放许可证密钥
+  }
+</script>
+</body>
+</html>
