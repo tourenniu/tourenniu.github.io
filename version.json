@@ -3,7 +3,9 @@
   "date": "2026-10-12",
   "min_blender": "4.0.0",
   "notes": "首个公开版本：路面、路口倒角、地块建筑、标线、红绿灯、车流六个模块。",
-  "download": "https://eletriceye.com/",
+  "download": "https://eletriceye.com/download/RoadBuilder-1.0.0.zip",
   "license_required": false,
-  "license_url": ""
+  "license_url": "",
+  "size_mb": 75.86,
+  "sha256": "F32FAF92D1AE874FD356E2E27A29D7DFA68BC1DFCBE2DD9196E0222B63EB7D15"
 }
