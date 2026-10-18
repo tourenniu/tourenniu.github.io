@@ -1,0 +1,15 @@
+# ---- 本地文件，不发布到线上 ----
+# 备份的旧版页面
+demo-snapmark.html
+index-v1-generic.html
+
+# 本地笔记 / 文档
+*.docx
+*.pdf
+*.md
+
+# 编辑器与缓存
+__pycache__/
+*.bak
+*.bak_*
+.idea/

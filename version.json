@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "date": "2026-10-12",
+  "min_blender": "4.0.0",
+  "notes": "首个公开版本：路面、路口倒角、地块建筑、标线、红绿灯、车流六个模块。",
+  "download": "https://eletriceye.com/",
+  "license_required": false,
+  "license_url": ""
+}
