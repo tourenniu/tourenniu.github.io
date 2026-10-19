@@ -349,6 +349,35 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
 .mobile-menu a:last-of-type{border-bottom:0}
 .mobile-menu .btn{width:100%;margin-top:18px}
 
+/* ---------- 宣传视频 ---------- */
+.video-frame{
+  position:relative;border-radius:22px;overflow:hidden;
+  border:1px solid var(--line);background:#000;
+  box-shadow:0 50px 120px -50px rgba(0,0,0,.95);
+}
+.video-frame video{
+  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;
+}
+
+/* ---------- 作品画廊 ---------- */
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:54px}
+.g-item{
+  position:relative;border-radius:16px;overflow:hidden;margin:0;
+  border:1px solid var(--line);background:#0c0d13;
+}
+.g-item img{
+  display:block;width:100%;height:100%;object-fit:cover;
+  transition:transform .55s ease;
+}
+.g-item:hover img{transform:scale(1.04)}
+.g-wide{grid-column:1 / -1}
+.g-item::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.4));
+  opacity:0;transition:opacity .3s;
+}
+.g-item:hover::after{opacity:1}
+
 /* ---------- 响应式 ---------- */
 @media(max-width:980px){
   .features,.pillars,.modules,.posts{grid-template-columns:1fr 1fr}
@@ -368,6 +397,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
   .cta-box{padding:56px 24px}
   .cta-band{padding-bottom:72px}
   .features,.pillars,.modules,.posts{grid-template-columns:1fr}
+  .gallery{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr;gap:30px}
   h1{letter-spacing:-.025em}
   .hero-meta{gap:14px;font-size:12px}
@@ -387,8 +417,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
     </a>
     <nav class="nav-links">
       <a href="#features">功能</a>
+      <a href="#gallery">作品</a>
       <a href="#workflow">工作流</a>
       <a href="#modules">模块</a>
+      <a href="#learn">教程</a>
       <a href="#download">下载</a>
     </nav>
     <div class="nav-right">
@@ -401,8 +433,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
 
 <div class="mobile-menu" id="mobileMenu">
   <a href="#features">功能</a>
+  <a href="#gallery">作品</a>
   <a href="#workflow">工作流</a>
   <a href="#modules">模块</a>
+  <a href="#learn">教程</a>
   <a href="#download" class="btn btn-primary">免费下载</a>
 </div>
 
@@ -436,20 +470,14 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
     </div>
   </div>
 
-  <!-- 演示视频 / 主视觉 -->
+  <!-- 宣传视频 -->
   <div class="wrap showcase">
-    <div class="screen reveal">
-      <div class="screen-glow"></div>
-      <div class="ph">
-        <div class="play">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-        <div class="ph-title">演示视频位置</div>
-        <div class="ph-note">
-          建议录 15–30 秒：画几条边 → 点击生成 → 完整街区出现<br>
-          或放一张城市路网俯视渲染图（1920×1080）
-        </div>
-      </div>
+    <div class="video-frame reveal">
+      <video autoplay muted loop controls playsinline preload="auto" poster="assets/promo-01.webp">
+        <source src="assets/roadbuilder-promo.mp4" type="video/mp4">
+        你的浏览器不支持视频播放，可直接
+        <a href="assets/roadbuilder-promo.mp4">下载观看</a>。
+      </video>
     </div>
   </div>
 </section>
@@ -502,16 +530,44 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
     </div>
   </div>
 </section>
+<!-- ================= 作品画廊 ================= -->
+<section class="section" id="gallery">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">GALLERY</span>
+      <h2>用 RoadBuilder 生成的场景</h2>
+      <p class="sec-sub">下面这些街道、路口和车流，全部由插件生成 —— 没有手动摆放，也没有后期拼贴。</p>
+    </div>
+
+    <div class="gallery">
+      <figure class="g-item g-wide reveal d1">
+        <img src="assets/promo-01.webp" alt="RoadBuilder 生成的城市街道" loading="lazy">
+      </figure>
+      <figure class="g-item reveal d2">
+        <img src="assets/promo-02.webp" alt="RoadBuilder 生成的城市街道" loading="lazy">
+      </figure>
+      <figure class="g-item reveal d3">
+        <img src="assets/promo-04.webp" alt="RoadBuilder 生成的城市街道" loading="lazy">
+      </figure>
+      <figure class="g-item g-wide reveal d1">
+        <img src="assets/promo-05.webp" alt="RoadBuilder 场景展示" loading="lazy">
+      </figure>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 工作流 ================= -->
 <section class="section" id="workflow">
   <div class="wrap">
     <div class="split">
       <div class="visual reveal">
         <div class="ph">
-          <div class="ph-title" style="color:#8b8f9e">工作流对比图</div>
+          <div class="play" style="margin-bottom:18px">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <div class="ph-title" style="color:#8b8f9e">操作演示视频</div>
           <div class="ph-note" style="margin-top:8px">
-            左边：手动铺路面 / 对齐人行道 / 修路口<br>
-            右边：画几条边 → 点一次生成
+            正在录制中 · 完整教程会放到下面的「教程」区
           </div>
         </div>
       </div>
@@ -737,6 +793,40 @@ footer{border-top:1px solid var(--line);padding:56px 0 34px;color:var(--muted)}
           <h3>建筑与地产可视化</h3>
           <p>地块自动切分并铺建筑，配合自己的建筑素材，快速做出周边环境。</p>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 教程 ================= -->
+<section class="section" id="learn">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">TUTORIALS</span>
+      <h2>从零开始，三节课上手</h2>
+      <p class="sec-sub">视频教程正在制作中，先把大纲放在这里。发布后会直接内嵌到这一区。</p>
+    </div>
+
+    <div class="modules">
+      <div class="mod reveal d1">
+        <span class="mod-num">LESSON 01</span>
+        <h3>安装与初始化</h3>
+        <p>装好插件、点一次「开始使用」把素材库导进来，五分钟内准备好一个能用的工程。</p>
+        <span class="kw">约 5 分钟</span>
+      </div>
+
+      <div class="mod reveal d2">
+        <span class="mod-num">LESSON 02</span>
+        <h3>画出第一条路</h3>
+        <p>从一条边开始，生成路面和人行道，再调宽度、坡度和路口倒角半径。</p>
+        <span class="kw">约 10 分钟</span>
+      </div>
+
+      <div class="mod reveal d3">
+        <span class="mod-num">LESSON 03</span>
+        <h3>路口、标线与信号</h3>
+        <p>做出一个完整交叉口：斑马线、标线、红绿灯，最后加上会转弯的车流。</p>
+        <span class="kw">约 15 分钟</span>
       </div>
     </div>
   </div>
